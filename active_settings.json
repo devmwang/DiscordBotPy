@@ -1,0 +1,7 @@
+{
+    "crypto-price-bots": {
+        "health-tracker": {
+            "enabled": false
+        }
+    }
+}
