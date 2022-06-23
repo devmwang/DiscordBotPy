@@ -26,6 +26,18 @@ class Others(Cog):
 
 
     # Commands
+    # Counters Tally Display
+    @cog_ext.cog_slash(name="counter", options=discordCommandOptions.counters, guild_ids=reference.guild_ids)
+    async def counter(self, context: SlashContext, target):
+        with open('counters.json') as counters_file:
+            counters_data = json.load(counters_file)
+
+            embed = discord.Embed(title=f'FTX Quickprice', color=0x00ff00)
+            embed.add_field(name='User:', value=target.mention)
+            embed.add_field(name='Current Total:', value=counters_data["word_counters"]["slay"][message.author.id])
+
+            message = await context.send(embed=embed)
+
     # Shafting Level Heat Map
     @cog_ext.cog_slash(name="heatmap", guild_ids=reference.guild_ids)
     async def heatmap(self, context: SlashContext):

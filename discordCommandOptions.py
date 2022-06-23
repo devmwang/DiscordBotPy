@@ -56,6 +56,10 @@ modifyToken = [
 ]
 
 # Others
+counters = [
+    create_option(name='target', description='User to acquire data for.', option_type=9, required=True)
+]
+
 presence = [
     create_option(name='action', description='Action', option_type=3, required=True, choices=[
         create_choice(name='Clear', value='clear'),
