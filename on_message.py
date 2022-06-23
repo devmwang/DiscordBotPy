@@ -1,5 +1,6 @@
 # Imports
 import asyncio
+import json
 import subprocess
 import random
 import discord
@@ -34,6 +35,19 @@ class OnMessage(Cog):
                     await message.reply(self.client.xmarkGlyph(message.guild), _e)
             else:
                 await message.reply(f"You do not have permission to use this command. {self.client.xmarkGlyph(message.guild)}")
+
+        # Word Counters (Tracks the number of times a user uses a word)
+        if "slay" in message.content:
+            with open('counters.json') as counters_file:
+                counters_data = json.load(counters_file)
+                
+                try:
+                    counters_data["word_counters"]["slay"][str(message.author.id)] += 1
+                except KeyError:
+                    counters_data["word_counters"]["slay"][str(message.author.id)] = 1
+
+                with open('counters.json', 'w') as outfile:
+                    json.dump(counters_data, outfile, indent=4)
 
 
 # Setup & Link
