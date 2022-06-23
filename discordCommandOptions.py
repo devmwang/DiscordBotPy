@@ -57,7 +57,8 @@ modifyToken = [
 
 # Others
 counters = [
-    create_option(name='target', description='User to acquire data for.', option_type=9, required=True)
+    create_option(name='target', description='User to acquire data for.', option_type=9, required=True),
+    create_option(name='word', description='Word to acquire data for.', option_type=3, required=True)
 ]
 
 presence = [

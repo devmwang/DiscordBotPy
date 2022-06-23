@@ -2,6 +2,7 @@
 import asyncio
 import os
 import datetime
+import json
 import subprocess
 from time import strftime
 import discord
@@ -28,13 +29,20 @@ class Others(Cog):
     # Commands
     # Counters Tally Display
     @cog_ext.cog_slash(name="counter", options=discordCommandOptions.counters, guild_ids=reference.guild_ids)
-    async def counter(self, context: SlashContext, target):
+    async def counter(self, context: SlashContext, target, word):
         with open('counters.json') as counters_file:
             counters_data = json.load(counters_file)
 
             embed = discord.Embed(title=f'FTX Quickprice', color=0x00ff00)
-            embed.add_field(name='User:', value=target.mention)
-            embed.add_field(name='Current Total:', value=counters_data["word_counters"]["slay"][message.author.id])
+            embed.add_field(name='User:', value=context.guild.get_member(int(target)).mention)
+            embed.add_field(name='Word:', value=word)
+
+            try:
+                curr_total = counters_data["word_counters"][word][target]
+            except KeyError:
+                curr_total = 0
+            
+            embed.add_field(name='Current Total:', value=curr_total)
 
             message = await context.send(embed=embed)
 
