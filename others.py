@@ -33,7 +33,7 @@ class Others(Cog):
         with open('counters.json') as counters_file:
             counters_data = json.load(counters_file)
 
-            embed = discord.Embed(title=f'FTX Quickprice', color=0x00ff00)
+            embed = discord.Embed(title=f'Word Counter', color=0x00ff00)
             embed.add_field(name='User:', value=context.guild.get_member(int(target)).mention)
             embed.add_field(name='Word:', value=word)
 
