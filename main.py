@@ -43,9 +43,6 @@ client.admin_id = 315238599761330197
 client.checkmarkGlyph = lambda guild : discord.utils.get(guild.emojis, name="checkmark")
 client.xmarkGlyph = lambda guild : discord.utils.get(guild.emojis, name="xmark")
 
-# Initialize controller states
-client.eventController = reference.eventControllerDict
-
 
 # On Ready
 @client.event
