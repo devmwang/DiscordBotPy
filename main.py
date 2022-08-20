@@ -30,7 +30,7 @@ import discordCommandOptions
 load_dotenv()
 
 # Startup cogs
-startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "uni", "channel_logging", "others", "vc_management", "clap"]
+startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
 
 # Initialize Discord client and slash command handler
 client = Bot(command_prefix="?", intents=discord.Intents.all())
