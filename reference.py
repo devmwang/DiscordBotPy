@@ -26,5 +26,5 @@ eal_monitored_servers = [696082479752413274]
 ftx_endpoint = 'https://ftx.com/api/'
 
 # Uniswap Module
-uniswap_version = 3
-eth_node = 'https://mainnet.infura.io/v3/08f42afb29804e18ab2b12d2b418661f'
+# uniswap_version = 3
+# eth_node = 'https://mainnet.infura.io/v3/08f42afb29804e18ab2b12d2b418661f'
