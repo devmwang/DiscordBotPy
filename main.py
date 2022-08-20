@@ -1,6 +1,5 @@
 # Imports
 import os
-import discord
 import time
 import sys
 import random
@@ -8,15 +7,11 @@ import logging
 import asyncio
 import subprocess
 from dotenv import load_dotenv
-from discord.ext.commands import Bot
-from datetime import datetime
-from discord.ext.commands import CommandNotFound
-from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
-import discord_slash
+import discord
+from discord import app_commands
+from discord.ext import commands, tasks
 
 import reference
-import discordCommandOptions
 
 ## Logging
 # logger = logging.getLogger('discord')
@@ -32,9 +27,31 @@ load_dotenv()
 # Startup cogs
 startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
 
+# Main Discord Guild
+CONTROL_GUILD = discord.Object(id=746647021561053215)
+MY_GUILD = discord.Object(id=696082479752413274)
+
 # Initialize Discord client and slash command handler
-client = Bot(command_prefix="?", intents=discord.Intents.all())
-slash = SlashCommand(client, sync_commands=True, sync_on_cog_reload=True)
+intents = discord.Intents.default()
+intents.message_content = True
+
+
+# Extend default discord.Bot class to sync commands to guild
+class MyClient(commands.Bot):
+    def __init__(self, *, command_prefix, intents: discord.Intents):
+        super().__init__(command_prefix=command_prefix, intents=intents)
+    
+    async def setup_hook(self):
+        # Copy global commands to guilds (Do not have to wait hour for global command updates to apply)
+        self.tree.copy_global_to(guild=CONTROL_GUILD)
+        await self.tree.sync(guild=CONTROL_GUILD)
+
+        self.tree.copy_global_to(guild=MY_GUILD)
+        await self.tree.sync(guild=MY_GUILD)
+
+
+# Create client
+client = MyClient(command_prefix="?", intents=intents)
 
 # Admin User ID
 client.admin_id = 315238599761330197
@@ -42,6 +59,9 @@ client.admin_id = 315238599761330197
 # Helper Methods
 client.checkmarkGlyph = lambda guild : discord.utils.get(guild.emojis, name="checkmark")
 client.xmarkGlyph = lambda guild : discord.utils.get(guild.emojis, name="xmark")
+
+
+
 
 
 # On Ready
@@ -63,7 +83,6 @@ async def on_ready():
     """)
 
     print("Running version " + discord.__version__ + " of Discord.py")
-    print("Running version " + discord_slash.__version__ + " of Discord Interactions")
     print('----------')
     print()
 
@@ -85,102 +104,82 @@ async def on_ready():
 
 
 # Restart Command
-@slash.slash(name='restart', description="Discord bot restart command.", guild_ids=reference.guild_ids)
-async def restart(context: SlashContext):
-    if context.author.id == client.admin_id:
-        await context.send(f"{client.checkmarkGlyph(context.guild)} Restart request accepted. Attempting to restart.")
+@client.tree.command(name='restart', description="Discord bot restart command.")
+async def restart(interaction: discord.Interaction):
+    if interaction.user.id == client.admin_id:
+        await interaction.response.send_message(f"{client.checkmarkGlyph(interaction.guild)} Restart request accepted. Attempting to restart.")
 
         subprocess.Popen("sudo systemctl restart discord-bot", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-        await context.send(f"Restart request denied. {client.xmarkGlyph(context.guild)}")
+        await interaction.response.send_message(f"Restart request denied. {client.xmarkGlyph(interaction.guild)}")
 
 # Shutdown Command
-@slash.slash(name='shutdown', description="Discord bot shutdown command.", guild_ids=reference.guild_ids)
-async def shutdown(context: SlashContext):
-    if context.author.id == client.admin_id:
-        await context.send(f"{client.checkmarkGlyph(context.guild)} Shutdown request accepted. Attempting to shutdown.")
+@client.tree.command(name='shutdown', description="Discord bot shutdown command.")
+async def shutdown(interaction: discord.Interaction):
+    if interaction.user.id == client.admin_id:
+        await interaction.response.send_message(f"{client.checkmarkGlyph(interaction.guild)} Shutdown request accepted. Attempting to shutdown.")
 
         subprocess.Popen("sudo systemctl stop discord-bot", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-        await context.send(f"Shutdown request denied. {client.xmarkGlyph(context.guild)}")
+        await interaction.response.send_message(f"Shutdown request denied. {client.xmarkGlyph(interaction.guild)}")
 
 
 # Ping Latency Test Command
-@slash.slash(name='ping', description="Measure client-to-bot latency.", guild_ids=reference.guild_ids)
-async def ping(context: SlashContext):
-    beforeping = time.monotonic()
-    messageping = await context.send("Pong!")
-    pingtime = (time.monotonic() - beforeping) * 1000
-    await messageping.edit(content=f"Pong! `{int(pingtime)}ms`")
-    # print(f'Ping {int(pingtime)}ms @ ' + time.ctime())
+@client.tree.command(name='ping', description="Measure client-to-bot latency.")
+async def ping(interaction: discord.Interaction):
+    before_ping = time.monotonic()
+    await interaction.response.send_message("Pong!")
+    ping_time = (time.monotonic() - before_ping) * 1000
+    await interaction.edit_original_response(content=f"Pong! `{int(ping_time)}ms`")
 
 
 # Load Cog Command
-@slash.slash(name='load', description="Load cog manually.", options=discordCommandOptions.loadOpts, guild_ids=reference.guild_ids)
-async def load(context: SlashContext, cog: str):
-    if context.author.id == client.admin_id:
+@client.tree.command(name='load', description="Load extension manually.")
+@app_commands.describe(extension="Name of extension to load.")
+async def load(interaction: discord.Interaction, extension: str):
+    if interaction.user.id == client.admin_id:
         try:
-            client.load_extension(cog)
-            msg = await context.send(f"Extension `{cog}` loaded. {client.checkmarkGlyph(context.guild)}")
+            await client.load_extension(extension)
+            msg = await interaction.response.send_message(f"Extension `{extension}` loaded. {client.checkmarkGlyph(interaction.guild)}")
         except Exception as e:
-            msg = await context.send(f"{e} {client.xmarkGlyph(context.guild)}")
+            msg = await interaction.response.send_message(f"{e} {client.xmarkGlyph(interaction.guild)}")
     else:
-        msg = await context.send(f"Bot state change denied. {client.xmarkGlyph(context.guild)}")
+        msg = await interaction.response.send_message(f"Bot state change denied. {client.xmarkGlyph(interaction.guild)}")
     
     await asyncio.sleep(reference.cmd_msg_delete_cooldown)
     await msg.delete()
-
-
-# # Load All Extensions
-# @client.command(name='loadall')
-# async def loadall(context):
-#     if context.author.id == client.admin_id:
-#         for extension in extensions:
-#             try:
-#                 client.load_extension(f"{extension}")
-#             except Exception as e:
-#                 await context.send(e)
 
 
 # Unload Extension Manually
-@slash.slash(name='unload', description="Unload cog manually.", options=discordCommandOptions.unloadOpts, guild_ids=reference.guild_ids)
-async def unload(context: SlashContext, cog: str):
-    if context.author.id == client.admin_id:
+@client.tree.command(name='unload', description="Unload extension manually.")
+@app_commands.describe(extension="Name of extension to unload.")
+async def unload(interaction: discord.Interaction, extension: str):
+    if interaction.user.id == client.admin_id:
         try:
-            client.unload_extension(cog)
-            msg = await context.send(f"Extension `{cog}` unloaded. {client.checkmarkGlyph(context.guild)}")
+            await client.unload_extension(extension)
+            msg = await interaction.response.send_message(f"Extension `{extension}` unloaded. {client.checkmarkGlyph(interaction.guild)}")
         except Exception as e:
-            msg = await context.send(f"{e} {client.xmarkGlyph(context.guild)}")
+            msg = await interaction.response.send_message(f"{e} {client.xmarkGlyph(interaction.guild)}")
     else:
-        msg = await context.send(f"Bot state change denied. {client.xmarkGlyph(context.guild)}")
+        msg = await interaction.response.send_message(f"Bot state change denied. {client.xmarkGlyph(interaction.guild)}")
     
     await asyncio.sleep(reference.cmd_msg_delete_cooldown)
     await msg.delete()
 
 
-# # Unload All Extensions
-# @client.command(name='unloadall')
-# async def unloadall(context):
-#     if context.author.id == client.admin_id:
-#         for extension in extensions:
-#             try:
-#                 client.unload_extension(f"{extension}")
-#             except Exception as e:
-#                 await context.send(e)
-
-
 # Reload Extensions
-@slash.slash(name='reload', description="Reload cog.", options=discordCommandOptions.reloadOpts, guild_ids=reference.guild_ids)
-async def unload(context: SlashContext, cog: str):
-    if context.author.id == client.admin_id:
-        client.unload_extension(cog)
+@client.tree.command(name='reload', description="Reload extension.")
+@app_commands.describe(extension="Name of extension to reload.")
+async def unload(interaction: discord.Interaction, extension: str):
+    if interaction.user.id == client.admin_id:
+        client.unload_extension(extension)
         try:
-            client.load_extension(cog)
-            msg = await context.send(f"Extension `{cog}` reloaded. {client.checkmarkGlyph(context.guild)}")
+            client.load_extension(extension)
+            msg = await interaction.response.send_message(f"Extension `{extension}` reloaded. {client.checkmarkGlyph(interaction.guild)}")
         except Exception as e:
-            msg = await context.send(f"{e} {client.xmarkGlyph(context.guild)}")
+            msg = await interaction.response.send_message(f"{e} {client.xmarkGlyph(interaction.guild)}")
     else:
-        msg = await context.send(f"Bot state change denied. {client.xmarkGlyph(context.guild)}")
+        msg = await interaction.response.send_message(f"Bot state change denied. {client.xmarkGlyph(interaction.guild)}")
 
     await asyncio.sleep(reference.cmd_msg_delete_cooldown)
     await msg.delete()
@@ -188,18 +187,18 @@ async def unload(context: SlashContext, cog: str):
 # # Custom Help
 # @client.command(name='help')
 # async def help(context):
-#     await context.send(f"lol, who reads the manual? {context.author.mention}")
+#     await interaction.response.send_message(f"lol, who reads the manual? {context.author.mention}")
 
 # Startup
 if __name__ == "__main__":
     print()
-    for cog in startup_cogs:
-        try:
-            print(f"Loading {cog}...", end=" ")
-            client.load_extension(cog)
-            print("Done!")
-        except Exception as e:
-            print(f"Failed to load {cog} with reason: {e}")
+    # for cog in startup_cogs:
+    #     try:
+    #         print(f"Loading {cog}...", end=" ")
+    #         client.load_extension(cog)
+    #         print("Done!")
+    #     except Exception as e:
+    #         print(f"Failed to load {cog} with reason: {e}")
     print()
 
-client.run(os.getenv('DISCORD_BOT_TOKEN'))
+    client.run(os.getenv('DISCORD_BOT_TOKEN'))
