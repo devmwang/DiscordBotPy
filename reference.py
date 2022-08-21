@@ -1,4 +1,11 @@
-# extensions = ["exec","others","clap","music","update","user_management","vc_management","chat_management","on_message"]
+import discord
+
+startup_extensions = ["jishaku", "exec", "cpanel"]
+# startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
+
+# Guilds
+CONTROL_GUILD = discord.Object(id=746647021561053215)
+MY_GUILD = discord.Object(id=696082479752413274)
 
 # DiscordBot Control
 controlGuildId = 746647021561053215
@@ -7,7 +14,6 @@ logChannelId = 746648561424269392
 theRobeanGuildId = 696082479752413274
 
 theRobeanGeneralChannelId = 918663904215859312
-
 
 guild_ids = [696082479752413274, 746647021561053215]
 cmd_msg_delete_cooldown = 3

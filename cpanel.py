@@ -1,22 +1,95 @@
-# Imports
 import asyncio
 import json
 import subprocess
 import time
+from turtle import title
 import discord
+from discord import app_commands, ui
 from discord.ext import tasks
-from discord.ext.commands import Bot, Cog, is_owner
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
-from discord_slash.model import ButtonStyle
-from discord_slash import ComponentContext
+from discord.ext.commands import Bot, Cog
 
 import reference
-import discordCommandOptions
 
-from bot_management import BotManagement
 
-# Class
+class CPanelSubsystemInputs(ui.Button):
+    def __init__(self, client, option, index):
+        self.client = client
+        self.option = option
+        self.index = index
+
+        super().__init__(label=option[1][index], style=discord.ButtonStyle(option[2][index]))
+
+    async def callback(self, interaction: discord.Interaction):
+        with open('active_settings.json') as settings_json_file:
+            settings_data = json.load(settings_json_file)
+
+            settings_data[self.option[0][0]][self.option[0][1]][self.option[0][2]] = self.option[3][self.index]
+
+            with open('active_settings.json', 'w') as outfile:
+                json.dump(settings_data, outfile, indent=4)
+
+        await interaction.response.send_message("Option updated successfully.")
+        await asyncio.sleep(reference.cmd_msg_delete_cooldown)
+        await interaction.delete_original_response()
+
+
+class CPanelSubsystemView(ui.View):
+    def __init__(self, client, option):
+        super().__init__()
+
+        for index in range(len(option[1])):
+            self.add_item(CPanelSubsystemInputs(client, option, index))
+
+
+class CPanelSelect(ui.Select):
+    def __init__(self, client, options_data, interaction):
+        self.client = client
+        self.options_data = options_data
+        self.interaction = interaction
+
+        select_options = []
+
+        for subsystem in options_data:
+            select_options.append(discord.SelectOption(label=subsystem))
+
+        super().__init__(placeholder='Choose a subsystem to modify:', min_values=1, max_values=1, options=select_options)
+
+    async def callback(self, interaction: discord.Interaction):
+        response_embed = discord.Embed(title=f"{self.values[0]} Subsystem", color=discord.Color.from_rgb(47, 49, 54))
+
+        await interaction.response.send_message(embed=response_embed)
+
+        option_messages = []
+
+        # Read curr values for cpanel display
+        with open('active_settings.json') as settings_json_file:
+            settings_data = json.load(settings_json_file)
+
+        for option in self.options_data[self.values[0]]:
+            option_dict = self.options_data[self.values[0]][option]
+            curr_value = option_dict[1][option_dict[3].index(settings_data[option_dict[0][0]][option_dict[0][1]][option_dict[0][2]])]
+
+            msg = await interaction.channel.send(content=f"**{option}:** Currently set to **{curr_value}**", view = CPanelSubsystemView(self.client, option_dict))
+            option_messages.append(msg)
+
+        # Delete all messages after button timeout (180 seconds default)
+        await asyncio.sleep(180)
+
+        for msg in option_messages:
+            await msg.delete()
+        
+        await interaction.delete_original_response()
+
+        await self.interaction.delete_original_response()
+
+
+class CPanelView(ui.View):
+    def __init__(self, client, options_data, interaction):
+        super().__init__()
+
+        self.add_item(CPanelSelect(client, options_data, interaction))
+
+
 class CPanel(Cog):
     def __init__(self, client):
         self.client = client
@@ -28,63 +101,18 @@ class CPanel(Cog):
 
             if data['crypto-price-bots']['health-tracker']['enabled'] == True:
                 self.check_price_bot_health.start()
-        
+
+
     # * Control Panel Command
-    @cog_ext.cog_slash(name='cpanel', description='Discord Bot Function Control Panel.', guild_ids=reference.guild_ids)
-    async def cpanel(self, context: SlashContext):
-        title_embed = discord.Embed(title=f'Discord Bot Control Panel', color=0x00ff00)
-        await context.reply(embed=title_embed)
+    @app_commands.command(name='cpanel', description='Discord Bot System Control Panel.')
+    async def cpanel(self, interaction: discord.Interaction):
+        with open('cpanel_options.json') as options_json_file:
+            options_data = json.load(options_json_file)
 
-        with open('active_settings.json') as settings_json_file:
-            settings_data = json.load(settings_json_file)
+            cpanel_view = CPanelView(self.client, options_data, interaction)
 
-            with open('cpanel_options.json') as options_json_file:
-                options_data = json.load(options_json_file)
+        await interaction.response.send_message(view=cpanel_view)
 
-                for module in options_data:
-                    await context.channel.send(content=f"**Module: {module}**")
-
-                    for option in options_data[module]:
-                        option_prop = options_data[module][option]
-
-                        buttons = [create_button(style=option_prop[2][0], label=option_prop[1][0]),
-                                    create_button(style=option_prop[2][1], label=option_prop[1][1])]
-                        action_row = create_actionrow(*buttons)
-
-                        curr_active_setting = settings_data[option_prop[0][0]][option_prop[0][1]][option_prop[0][2]]
-                        conv_curr_active_to_display = option_prop[1][option_prop[3].index(curr_active_setting)]
-
-                        msg = await context.channel.send(content=f"**{option}**: Currently set to __{conv_curr_active_to_display}__.", components=[action_row])
-
-                        try:
-                            while True:
-                                button_ctx: ComponentContext = await wait_for_component(self.client, components=action_row, timeout=10)
-                                
-                                # Check that user who clicked button has permissions to change specified setting
-                                if (button_ctx.author_id in option_prop[4]):
-                                    selector_index = option_prop[1].index(button_ctx.component['label'])
-                                    settings_data[option_prop[0][0]][option_prop[0][1]][option_prop[0][2]] = option_prop[3][selector_index]
-
-                                    with open('active_settings.json', 'w') as outfile:
-                                        json.dump(settings_data, outfile, indent=4)
-
-                                        await button_ctx.send(content=f"**{option}** updated to __{button_ctx.component['label']}__.")
-                                        await msg.edit(components=[])
-
-                                        # CPanel Loop Control
-                                        match(option_prop[5]):
-                                            case "crypto-price-bot-health-tracker-enabled":
-                                                if settings_data[option_prop[0][0]][option_prop[0][1]][option_prop[0][2]]:
-                                                    try:
-                                                        self.check_price_bot_health.start()
-                                                    except RuntimeError:
-                                                        pass
-                                                else:
-                                                    self.check_price_bot_health.stop()
-                                else:
-                                    await button_ctx.send(content=f"You do not have permission to modify this setting.")
-                        except asyncio.TimeoutError:
-                            await msg.edit(components=[])
 
     # * Asynchronous Loops
     # Async Loop for Bot Health Tracker
@@ -140,6 +168,5 @@ class CPanel(Cog):
         await self.client.wait_until_ready()
 
 
-# Setup & Link
-def setup(client):
-    client.add_cog(CPanel(client))
+async def setup(client):
+    await client.add_cog(CPanel(client))
