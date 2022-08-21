@@ -25,12 +25,16 @@ class CPanelSubsystemInputs(ui.Button):
         with open('active_settings.json') as settings_json_file:
             settings_data = json.load(settings_json_file)
 
+            old_value = self.option[1][self.option[3].index(settings_data[self.option[0][0]][self.option[0][1]][self.option[0][2]])]
+
             settings_data[self.option[0][0]][self.option[0][1]][self.option[0][2]] = user_selection
 
             with open('active_settings.json', 'w') as outfile:
                 json.dump(settings_data, outfile, indent=4)
 
-        await interaction.response.send_message("Option updated successfully.")
+        new_value = self.option[1][self.option[3].index(user_selection)]
+
+        await interaction.response.send_message(f"**Option updated successfully** ({old_value} -> {new_value})")
         await asyncio.sleep(reference.cmd_msg_delete_cooldown)
         await interaction.delete_original_response()
 
@@ -56,12 +60,15 @@ class CPanelSelect(ui.Select):
 
         super().__init__(placeholder='Choose a subsystem to modify:', min_values=1, max_values=1, options=select_options)
 
+
     async def callback(self, interaction: discord.Interaction):
+        self.callback_interaction = interaction
+
         response_embed = discord.Embed(title=f"{self.values[0]} Subsystem", color=discord.Color.from_rgb(47, 49, 54))
 
         await interaction.response.send_message(embed=response_embed)
 
-        option_messages = []
+        self.option_messages = []
 
         # Read curr values for cpanel display
         with open('active_settings.json') as settings_json_file:
@@ -72,12 +79,13 @@ class CPanelSelect(ui.Select):
             curr_value = option_dict[1][option_dict[3].index(settings_data[option_dict[0][0]][option_dict[0][1]][option_dict[0][2]])]
 
             msg = await interaction.channel.send(content=f"**{option}:** Currently set to **{curr_value}**", view = CPanelSubsystemView(self.client, option_dict))
-            option_messages.append(msg)
+            
+            self.option_messages.append(msg)
 
         # Delete all messages after button timeout (180 seconds default)
         await asyncio.sleep(180)
 
-        for msg in option_messages:
+        for msg in self.option_messages:
             await msg.delete()
         
         await interaction.delete_original_response()
