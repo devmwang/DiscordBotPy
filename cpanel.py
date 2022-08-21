@@ -2,11 +2,10 @@ import asyncio
 import json
 import subprocess
 import time
-from turtle import title
 import discord
 from discord import app_commands, ui
 from discord.ext import tasks
-from discord.ext.commands import Bot, Cog
+from discord.ext.commands import Cog
 
 import reference
 
