@@ -32,7 +32,7 @@ class CPanelSubsystemInputs(ui.Button):
             with open('active_settings.json', 'w') as outfile:
                 json.dump(settings_data, outfile, indent=4)
 
-        new_value = self.option[1][self.option[3].index(user_selection)]
+        new_value = self.option[1][self.index]
 
         await interaction.response.send_message(f"**Option updated successfully** ({old_value} -> {new_value})")
         await asyncio.sleep(reference.cmd_msg_delete_cooldown)
