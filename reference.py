@@ -1,11 +1,14 @@
 import discord
 
-startup_extensions = ["jishaku", "exec", "cpanel"]
+startup_extensions = ["jishaku", "exec", "cpanel", "bot_management"]
 # startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
 
 # Guilds
-CONTROL_GUILD = discord.Object(id=746647021561053215)
-MY_GUILD = discord.Object(id=696082479752413274)
+CONTROL_GUILD_ID = 746647021561053215
+TR_GUILD_ID = 696082479752413274
+
+CONTROL_GUILD = discord.Object(id=CONTROL_GUILD_ID)
+TR_GUILD = discord.Object(id=TR_GUILD_ID)
 
 # DiscordBot Control
 controlGuildId = 746647021561053215
@@ -15,8 +18,7 @@ theRobeanGuildId = 696082479752413274
 
 theRobeanGeneralChannelId = 918663904215859312
 
-guild_ids = [696082479752413274, 746647021561053215]
-cmd_msg_delete_cooldown = 3
+cmd_msg_delete_cooldown = 5
 
 # Relevant IDs
 TRGeneralId = 696082479752413277

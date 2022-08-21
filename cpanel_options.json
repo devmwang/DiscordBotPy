@@ -5,7 +5,7 @@
             ["Yes", "No"],
             [3, 4],
             [true, false],
-            [315238599761330197, 291661685863874560],
+            "bot_management",
             "price-bot-life-support-enabled"
         ]
     }

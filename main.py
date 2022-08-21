@@ -14,10 +14,10 @@ from discord.ext import commands, tasks
 import reference
 
 ## Logging
-# logger = logging.getLogger('discord')
+# logger = logging.getLogger("discord")
 # logger.setLevel(logging.INFO)
-# handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+# handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+# handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 # logger.addHandler(handler)
 
 
@@ -39,15 +39,19 @@ class MyClient(commands.Bot):
         self.tree.copy_global_to(guild=reference.CONTROL_GUILD)
         await self.tree.sync(guild=reference.CONTROL_GUILD)
 
-        self.tree.copy_global_to(guild=reference.MY_GUILD)
-        await self.tree.sync(guild=reference.MY_GUILD)
+        self.tree.copy_global_to(guild=reference.TR_GUILD)
+        await self.tree.sync(guild=reference.TR_GUILD)
 
 
 def main():
     # Create client
     client = commands.Bot(command_prefix="?", intents=intents)
 
+    # Initialize global state management system
+    client.state = {}
 
+    # Create subsystem states
+    client.state["bot_management"] = {}
 
     # Admin User ID
     client.admin_id = 315238599761330197
@@ -93,8 +97,8 @@ def main():
         client.tree.copy_global_to(guild=reference.CONTROL_GUILD)
         await client.tree.sync(guild=reference.CONTROL_GUILD)
 
-        client.tree.copy_global_to(guild=reference.MY_GUILD)
-        await client.tree.sync(guild=reference.MY_GUILD)
+        client.tree.copy_global_to(guild=reference.TR_GUILD)
+        await client.tree.sync(guild=reference.TR_GUILD)
 
         # Set Logging Channels
         client.controlGuild = client.get_guild(reference.controlGuildId)
