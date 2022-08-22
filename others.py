@@ -14,7 +14,6 @@ from discord.ext.commands import Bot, Cog
 import reference
 
 
-# Class
 class Others(Cog):
     def __init__(self, client: Bot):
         self.client = client
