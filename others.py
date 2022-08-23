@@ -22,9 +22,9 @@ class Others(Cog):
     @app_commands.command(name='clearmsg', description='Delete messages from channel.')
     @app_commands.describe(amount="Number of messages to clear.")
     async def clearmsg(self, interaction: discord.Interaction, amount: int = 5):
-        await interaction.response.defer()
-
         if interaction.user.id == self.client.admin_id:
+            await interaction.response.defer()
+
             self.client.deleted_messages = []
             async for message in interaction.channel.history(limit=amount+1):
                 self.client.deleted_messages.append(message)
@@ -33,7 +33,7 @@ class Others(Cog):
             await interaction.channel.delete_messages(self.client.deleted_messages)
             await interaction.channel.send(f"{amount} message{'s' if amount != 1 else ''} deleted. {self.client.checkmarkGlyph(interaction.guild)}")
         else:
-            await interaction.channel.send(f"Access denied - You do not have permission to access this command. {self.client.xmarkGlyph(interaction.guild)}")
+            await interaction.response.send_message(f"Access denied - You do not have permission to access this command. {self.client.xmarkGlyph(interaction.guild)}")
 
 
     @app_commands.command(name='restoremsg', description='Restore last batch of deleted messages.')
