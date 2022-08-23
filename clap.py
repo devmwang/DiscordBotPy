@@ -1,46 +1,44 @@
-# Imports
 import discord
+from discord import app_commands
 from discord.ext.commands import Bot, Cog
-from discord_slash import cog_ext, SlashContext
 
 import reference
-import discordCommandOptions
 
 
-# Class
 class Clap(Cog):
-    def __init__(self, client):
+    def __init__(self, client: Bot):
         self.client = client
 
     # Commands
     # Clap Command
-    @cog_ext.cog_slash(name='clap', options=discordCommandOptions.clap, guild_ids=reference.guild_ids)
-    async def clap(self, context: SlashContext, target, amount = 5):
-        target = context.guild.get_member(int(target))
-
+    @app_commands.command(name='clap', description='Clap!')
+    @app_commands.describe(target="Target to clap.", amount="Times to clap user.")
+    async def clap(self, interaction: discord.Interaction, target: discord.Member, amount: int = 5):
         if target.id == self.client.admin_id:
-            await context.send(f"PTS is in effect. {self.client.xmarkGlyph(context.guild)}")
+            await interaction.response.send_message(f"PTS is in effect. {self.client.xmarkGlyph(interaction.guild)}")
         else:
+            await interaction.response.send_message(content=f"Initiating clapping.")
+
             for _ in range(0, int(amount)):
-                await context.channel.send(f"Clapped {target.mention}")
-            
-            await context.send("Done!")
+                await interaction.channel.send(f"Clapped {target.mention}")
+
+            await interaction.followup.send(content="Done!")
 
     # DM Clap Command
-    @cog_ext.cog_slash(name='dmclap', options=discordCommandOptions.clap, guild_ids=reference.guild_ids)
-    async def dmclap(self, context: SlashContext, target, amount = 5):
-        target = context.guild.get_member(int(target))
+    @app_commands.command(name='dmclap')
+    @app_commands.describe(target="Target to clap.", amount="Times to clap user.")
+    async def dmclap(self, interaction: discord.Interaction, target: discord.Member, amount: int = 5):
+        # if target.id == self.client.admin_id:
+        #     await interaction.response.send_message(f"PTS is in effect. {self.client.xmarkGlyph(interaction.guild)}")
+        # else:
+        await interaction.response.send_message(content=f"Initiating clapping.")
 
-        if target.id == self.client.admin_id:
-            await context.send(f"PTS is in effect. {self.client.xmarkGlyph(context.guild)}")
-        else:
-            channel = await target.create_dm()
-            for _ in range(0, amount):
-                await channel.send(f"Clapped {target.mention}")
-            
-            await context.send("Done!")
+        for _ in range(0, amount):
+            await target.send(f"Clapped {target.mention}")
+        
+        await interaction.followup.send(content="Done!")
 
 
 # Setup & Link
-def setup(client):
-    client.add_cog(Clap(client))
+async def setup(client: Bot):
+    await client.add_cog(Clap(client))

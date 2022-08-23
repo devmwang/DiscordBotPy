@@ -1,6 +1,6 @@
 import discord
 
-startup_extensions = ["jishaku", "exec", "cpanel", "bot_management", "others", "ftx"]
+startup_extensions = ["jishaku", "exec", "cpanel", "bot_management", "others", "ftx", "clap"]
 # startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
 
 # Guilds
