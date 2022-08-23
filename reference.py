@@ -1,23 +1,21 @@
 import discord
 
-startup_extensions = ["jishaku", "on_message", "exec", "cpanel", "bot_management", "others", "ftx", "clap"]
+startup_extensions = ["jishaku", "on_message", "on_voice_state_update", "exec", "cpanel", "bot_management", "others", "ftx", "clap"]
 # startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
 
-# Guilds
+# DiscordBot Control
 CONTROL_GUILD_ID = 746647021561053215
-TR_GUILD_ID = 696082479752413274
-
 CONTROL_GUILD = discord.Object(id=CONTROL_GUILD_ID)
+
+CONTROL_LOG_ID = 746648561424269392
+
+# TR
+TR_GUILD_ID = 696082479752413274
 TR_GUILD = discord.Object(id=TR_GUILD_ID)
 
-# DiscordBot Control
-controlGuildId = 746647021561053215
-logChannelId = 746648561424269392
+TR_GUILD_GENERAL_ID = 918663904215859312
 
-theRobeanGuildId = 696082479752413274
-
-theRobeanGeneralChannelId = 918663904215859312
-
+# Reference Values
 cmd_msg_delete_cooldown = 5
 
 # Relevant IDs

@@ -101,10 +101,10 @@ def main():
         await client.tree.sync(guild=reference.TR_GUILD)
 
         # Set Logging Channels
-        client.controlGuild = client.get_guild(reference.controlGuildId)
-        client.logChannel = client.get_channel(reference.logChannelId)
+        client.controlGuild = client.get_guild(reference.CONTROL_GUILD_ID)
+        client.logChannel = client.get_channel(reference.CONTROL_LOG_ID)
 
-        client.theRobeanGeneral = client.get_channel(reference.theRobeanGeneralChannelId)
+        client.theRobeanGeneral = client.get_channel(reference.TR_GUILD_GENERAL_ID)
 
         client.channel_logging_enabled = False
 
