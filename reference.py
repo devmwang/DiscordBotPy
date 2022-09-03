@@ -1,7 +1,6 @@
 import discord
 
-startup_extensions = ["jishaku", "on_message", "on_voice_state_update", "exec", "cpanel", "bot_management", "others", "ftx", "clap"]
-# startup_cogs = ["jishaku", "exec", "cpanel", "bot_management", "on_message", "on_voice_state_update", "ftx", "channel_logging", "others", "vc_management", "clap"]
+startup_extensions = ["jishaku", "on_message", "on_voice_state_update", "exec", "cpanel", "bot_management", "others", "ftx", "clap", "vc_management"]
 
 # DiscordBot Control
 CONTROL_GUILD_ID = 746647021561053215
@@ -30,7 +29,3 @@ eal_monitored_servers = [696082479752413274]
 
 # FTX Module
 ftx_endpoint = 'https://ftx.com/api/'
-
-# Uniswap Module
-# uniswap_version = 3
-# eth_node = 'https://mainnet.infura.io/v3/08f42afb29804e18ab2b12d2b418661f'
