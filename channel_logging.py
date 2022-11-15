@@ -1,4 +1,3 @@
-# Imports
 import os
 import time
 import discord
@@ -7,7 +6,6 @@ from discord.ext.commands import Bot, Cog, is_owner
 import reference
 
 
-# Class
 class ChannelLogging(Cog):
     def __init__(self, client):
         self.client = client
@@ -39,5 +37,5 @@ class ChannelLogging(Cog):
 
 
 # Setup & Link
-def setup(client):
-    client.add_cog(ChannelLogging(client))
+async def setup(client):
+    await client.add_cog(ChannelLogging(client))

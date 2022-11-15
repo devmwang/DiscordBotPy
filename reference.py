@@ -1,16 +1,21 @@
-# extensions = ["exec","others","clap","music","update","user_management","vc_management","chat_management","on_message"]
+import discord
+
+startup_extensions = ["jishaku", "on_message", "on_voice_state_update", "exec", "cpanel", "bot_management", "others", "ftx", "clap", "vc_management"]
 
 # DiscordBot Control
-controlGuildId = 746647021561053215
-logChannelId = 746648561424269392
+CONTROL_GUILD_ID = 746647021561053215
+CONTROL_GUILD = discord.Object(id=CONTROL_GUILD_ID)
 
-theRobeanGuildId = 696082479752413274
+CONTROL_LOG_ID = 746648561424269392
 
-theRobeanGeneralChannelId = 918663904215859312
+# TR
+TR_GUILD_ID = 696082479752413274
+TR_GUILD = discord.Object(id=TR_GUILD_ID)
 
+TR_GUILD_GENERAL_ID = 918663904215859312
 
-guild_ids = [696082479752413274, 746647021561053215]
-cmd_msg_delete_cooldown = 3
+# Reference Values
+cmd_msg_delete_cooldown = 5
 
 # Relevant IDs
 TRGeneralId = 696082479752413277
@@ -24,7 +29,3 @@ eal_monitored_servers = [696082479752413274]
 
 # FTX Module
 ftx_endpoint = 'https://ftx.com/api/'
-
-# Uniswap Module
-# uniswap_version = 3
-# eth_node = 'https://mainnet.infura.io/v3/08f42afb29804e18ab2b12d2b418661f'

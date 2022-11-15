@@ -1,6 +1,6 @@
 {
-    "crypto-price-bots": {
-        "health-tracker": {
+    "price-bots": {
+        "life-support": {
             "enabled": false
         }
     }

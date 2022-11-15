@@ -1,12 +1,12 @@
 {
-    "Crypto Price Bot Health Tracker": {
+    "Price Bot Life Support": {
         "Enabled": [
-            ["crypto-price-bots", "health-tracker", "enabled"],
+            ["price-bots", "life-support", "enabled"],
             ["Yes", "No"],
             [3, 4],
             [true, false],
-            [315238599761330197, 291661685863874560],
-            "crypto-price-bot-health-tracker-enabled"
+            "bot_management",
+            "price-bot-life-support-enabled"
         ]
     }
 }

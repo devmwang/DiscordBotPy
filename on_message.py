@@ -1,18 +1,13 @@
-# Imports
-import asyncio
 import json
 import subprocess
-import random
 import discord
-from discord.ext.commands import Bot, Cog, is_owner
-from discord_slash import cog_ext, SlashContext
+from discord.ext.commands import Bot, Cog
 
 import reference
 
 
-# Class
 class OnMessage(Cog):
-    def __init__(self, client):
+    def __init__(self, client: Bot):
         self.client = client
 
     # Listener
@@ -36,20 +31,7 @@ class OnMessage(Cog):
             else:
                 await message.reply(f"You do not have permission to use this command. {self.client.xmarkGlyph(message.guild)}")
 
-        # Word Counters (Tracks the number of times a user uses a word)
-        if "slay" in message.content:
-            with open('counters.json') as counters_file:
-                counters_data = json.load(counters_file)
-                
-                try:
-                    counters_data["word_counters"]["slay"][str(message.author.id)] += 1
-                except KeyError:
-                    counters_data["word_counters"]["slay"][str(message.author.id)] = 1
-
-                with open('counters.json', 'w') as outfile:
-                    json.dump(counters_data, outfile, indent=4)
-
 
 # Setup & Link
-def setup(client):
-    client.add_cog(OnMessage(client))
+async def setup(client: Bot):
+    await client.add_cog(OnMessage(client))
