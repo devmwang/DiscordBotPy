@@ -1,6 +1,18 @@
 import discord
 
-startup_extensions = ["jishaku", "on_message", "on_voice_state_update", "exec", "cpanel", "bot_management", "others", "ftx", "clap", "vc_management"]
+startup_extensions = [
+    "jishaku",
+    "on_message",
+    "on_voice_state_update",
+    "exec",
+    "cpanel",
+    "school",
+    "bot_management",
+    "others",
+    "ftx",
+    "clap",
+    "vc_management",
+]
 
 # DiscordBot Control
 CONTROL_GUILD_ID = 746647021561053215
@@ -28,4 +40,4 @@ ryan_price_bots_role_id = 944001011775852585
 eal_monitored_servers = [696082479752413274]
 
 # FTX Module
-ftx_endpoint = 'https://ftx.com/api/'
+ftx_endpoint = "https://ftx.com/api/"

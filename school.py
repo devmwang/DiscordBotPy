@@ -1,10 +1,8 @@
-# Imports
 import discord
+from discord import app_commands
 from discord.ext.commands import Bot, Cog
-from discord_slash import cog_ext, SlashContext
 
 import reference
-import discordCommandOptions
 
 
 # Class
@@ -13,9 +11,15 @@ class School(Cog):
         self.client = client
 
     # Commands
-    # Clap Command
+    # Show Timetable Command
+    @app_commands.command(name="timetable", description="Produce class timetable.")
+    async def clap(self, interaction: discord.Interaction):
+
+        await interaction.response.send_message(
+            content=f"https://files.mwang.tk/wAba9/xusEVIfa37.png"
+        )
 
 
 # Setup & Link
-def setup(client):
-    client.add_cog(School(client))
+async def setup(client):
+    await client.add_cog(School(client))
