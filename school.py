@@ -16,7 +16,7 @@ class School(Cog):
     async def clap(self, interaction: discord.Interaction):
 
         await interaction.response.send_message(
-            content=f"https://files.mwang.tk/wAba9/xusEVIfa37.png"
+            content=f"https://files.devmwang.com/wAba9/PedAVuGE23.png"
         )
 
 
