@@ -41,8 +41,11 @@ class OnMessage(Cog):
                 )
 
         # Chat Filter
-        if message.content.contains("Did you mean "):
-            message.delete()
+        filtered_seqs = ["Did you mean"]
+
+        for seq in filtered_seqs:
+            if seq in message.content:
+                await message.delete()
 
 
 # Setup & Link
