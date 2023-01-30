@@ -41,7 +41,7 @@ class OnMessage(Cog):
                 )
 
         # Chat Filter
-        filtered_seqs = ["did you mean", "you meant"]
+        filtered_seqs = ["did you mean", "you meant", "you appear to have misspelt"]
 
         for seq in filtered_seqs:
             if seq in message.content.lower():
