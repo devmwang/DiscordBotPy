@@ -182,6 +182,30 @@ def main():
                 f"Shutdown request denied. {client.xmarkGlyph(interaction.guild)}"
             )
 
+    # Update Command
+    @client.tree.command(name="update", description="Discord bot update command.")
+    async def update(interaction: discord.Interaction):
+        await interaction.response.defer()
+
+        pipe = subprocess.Popen("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = pipe.communicate()
+        response = out.decode()
+        error = err.decode()
+        combined = response + error
+
+        await interaction.followup.send(f"```{combined}```")
+
+        if "Already up to date." in response:
+            pass  # Do nothing
+        elif "fatal" not in combined:
+            # Create regex to get all strings that end in .py
+            regex = re.compile(r"(\w+\.py)")
+
+            await interaction.followup.send("Successfully pulled updates from Github. Attempting to restart modified modules.")
+            subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
+        else:
+            await interaction.followup.send("An error occurred, refer to system logs for more info.")
+
     # Ping Latency Test Command
     @client.tree.command(name="ping", description="Measure client-to-bot latency.")
     async def ping(interaction: discord.Interaction):
