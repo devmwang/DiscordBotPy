@@ -5,8 +5,6 @@ from discord.ext.commands import Bot, Cog
 
 import reference
 
-# test
-
 
 class Exec(Cog):
     def __init__(self, client: Bot):
