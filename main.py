@@ -1,5 +1,6 @@
 # Imports
 import os
+import re
 import time
 import sys
 import random
@@ -187,7 +188,9 @@ def main():
     async def update(interaction: discord.Interaction):
         await interaction.response.defer()
 
-        pipe = subprocess.Popen("git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pipe = subprocess.Popen(
+            "git pull", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         out, err = pipe.communicate()
         response = out.decode()
         error = err.decode()
@@ -198,13 +201,27 @@ def main():
         if "Already up to date." in response:
             pass  # Do nothing
         elif "fatal" not in combined:
-            # Create regex to get all strings that end in .py
-            regex = re.compile(r"(\w+\.py)")
+            await interaction.followup.send(
+                "Successfully pulled updates from Github. Attempting to restart modified modules."
+            )
 
-            await interaction.followup.send("Successfully pulled updates from Github. Attempting to restart modified modules.")
-            subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
+            updated_modules = re.findall(r"(\w+\.py)", combined)
+
+            for module in updated_modules:
+                try:
+                    print(f"Reloading {module}...", end=" ")
+                    await client.reload_extension(module)
+                    print("Done!")
+                except Exception as e:
+                    print(f"Failed to reload {module} with reason: {e}")
+                    await interaction.followup.send(
+                        "Failed to reload 1 or more modules. Attempting to restart."
+                    )
+                    subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
         else:
-            await interaction.followup.send("An error occurred, refer to system logs for more info.")
+            await interaction.followup.send(
+                "An error occurred, refer to system logs for more info."
+            )
 
     # Ping Latency Test Command
     @client.tree.command(name="ping", description="Measure client-to-bot latency.")
