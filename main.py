@@ -205,7 +205,9 @@ def main():
                 "Successfully pulled updates from Github. Attempting to restart modified modules."
             )
 
-            updated_modules = re.findall(r"(\w+\.py)", combined)
+            updated_modules = set(re.findall(r"(\w+\.py)", combined))
+
+            print(updated_modules)
 
             for module in updated_modules:
                 try:
@@ -218,6 +220,7 @@ def main():
                         "Failed to reload 1 or more modules. Attempting to restart."
                     )
                     subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
+                    break
         else:
             await interaction.followup.send(
                 "An error occurred, refer to system logs for more info."
