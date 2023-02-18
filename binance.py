@@ -70,7 +70,7 @@ def _process_response(response: Response):
 
 
 def createErrorEmbed(error: str):
-    embed = discord.Embed(title=f'FTX Error', color=0xff0000)
+    embed = discord.Embed(title=f'Binance Error', color=0xff0000)
     embed.add_field(name='Error: ', value=error)
 
     return embed
@@ -83,38 +83,30 @@ def parseLargeValues(volume: int):
         return [volume/(10**3), "Thousand"]
 
 
-class FTX(Cog):
+class Binance(Cog):
     def __init__(self, client: Bot):
         self.client = client
 
-    @app_commands.command(name='quickprice', description='Get current USD cost of any perpetual contract on FTX.')
+    @app_commands.command(name='quickprice', description='Get current USD cost of a perpetual contract on Binance.')
     @app_commands.describe(ticker="Ticker of asset to get price for.")
     async def quickprice(self, interaction: discord.Interaction, ticker: str):
-        response = requests.get(f"https://ftx.com/api/markets/{ticker}-PERP")
+        # response = requests.get(f"https://ftx.com/api/markets/{ticker}-PERP")
+        response = requests.get(f"https://fapi.binance.com/fapi/v1/ticker/24hr?symbol={ticker}USDT")
         data = json.loads(response.content)
-        price = float(data['result']['last'])
-        volume_24h = float(data['result']['volumeUsd24h'])
-        percent_change_1h = float(data['result']['change1h']) * 100
-        percent_change_24h = float(data['result']['change24h']) * 100
+        price = float(data['lastPrice'])
+        percent_change_24h = float(data['priceChangePercent'])
 
-        futures_response = requests.get(f"https://ftx.com/api/futures/{ticker}-PERP/stats")
-        futures_data = json.loads(futures_response.content)
-        next_funding_rate_percent = float(futures_data['result']['nextFundingRate']) * 100
-
-        if percent_change_1h < 0:
+        if percent_change_24h < 0:
             embed_color = 0xff0000
-        elif percent_change_1h > 0:
+        elif percent_change_24h > 0:
             embed_color = 0x00ff00
         else:
             embed_color = 0xc6c6c6
 
 
-        embed = discord.Embed(title=f'FTX Quickprice', color=embed_color)
+        embed = discord.Embed(title=f'Binance Quickprice', color=embed_color)
         embed.add_field(name='Ticker:', value=ticker.upper())
         embed.add_field(name='Last Price:', value=f"{round(price, 5)} USD")
-        embed.add_field(name='Volume:', value=f"{round(parseLargeValues(volume_24h)[0], 3)} {parseLargeValues(volume_24h)[1]} USD")
-        embed.add_field(name='Next Funding Rate:', value=f"{round(next_funding_rate_percent, 5)}%")
-        embed.add_field(name='1 Hour Change:', value=f"{round(percent_change_1h, 3)}%")
         embed.add_field(name='24 Hour Change:', value=f"{round(percent_change_24h, 3)}%")
 
         await interaction.response.send_message(embed=embed)
@@ -122,7 +114,7 @@ class FTX(Cog):
     @app_commands.command(name='lendingprofit', description='Get lending profits.')
     @app_commands.describe(hours="Time range to calculate lending profit from.")
     async def lendingprofit(self, interaction: discord.Interaction, hours: int = None):
-        embed = discord.Embed(title=f'FTX Lending Profit', color=0x00ff00)
+        embed = discord.Embed(title=f'Binance Lending Profit', color=0x00ff00)
 
         if hours:
             embed.add_field(name='Last: ', value=f'{hours} Hours')
@@ -150,7 +142,7 @@ class FTX(Cog):
     @app_commands.command(name='fundingpayments', description='Get total funding payments.')
     @app_commands.describe(hours="Time range to calculate funding payments from.")
     async def fundingpayments(self, interaction: discord.Interaction, hours: int = None):
-        embed = discord.Embed(title=f'FTX Perpetual Funding Payments', color=0x00ff00)
+        embed = discord.Embed(title=f'Binance Perpetual Funding Payments', color=0x00ff00)
 
         if hours:
             embed.add_field(name='Last: ', value=f'{hours} Hours')
@@ -182,7 +174,7 @@ class FTX(Cog):
 
     @app_commands.command(name='lendinfo', description='Lending Offer Information')
     async def lendinfo(self, interaction: discord.Interaction):
-        embed = discord.Embed(title=f'FTX Lending Offer Information', color=0x00ff00)
+        embed = discord.Embed(title=f'Binance Lending Offer Information', color=0x00ff00)
 
         lending_offers = get('spot_margin/offers')
             
@@ -204,7 +196,7 @@ class FTX(Cog):
 
     @app_commands.command(name='stakeinfo', description='Stake information.')
     async def stakeinfo(self, interaction: discord.Interaction):
-        embed = discord.Embed(title=f'FTX Stake Information', color=0x00ff00)
+        embed = discord.Embed(title=f'Binance Stake Information', color=0x00ff00)
 
         stake_info = get('staking/balances')
             
@@ -227,4 +219,4 @@ class FTX(Cog):
 
 # Setup & Link
 async def setup(client: Bot):
-    await client.add_cog(FTX(client))
+    await client.add_cog(Binance(client))

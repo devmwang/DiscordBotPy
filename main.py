@@ -28,7 +28,7 @@ startup_cogs = [
     "on_message",
     "on_voice_state_update",
     "school",
-    "ftx",
+    "binance",
     "channel_logging",
     "others",
     "vc_management",
