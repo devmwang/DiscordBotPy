@@ -199,9 +199,7 @@ def main():
                 await interaction.followup.send(
                     "Successfully pulled updates from Github. Modifications to main detected. Attempting to restart system."
                 )
-                await interaction.followup.send(
-                    f'Failed to reload module "{module}". Attempting to restart system.'
-                )
+                subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
 
             else:
                 await interaction.followup.send(
@@ -218,9 +216,7 @@ def main():
                     await interaction.followup.send(
                         f'Failed to reload module "{module}". Attempting to restart system.'
                     )
-                    subprocess.Popen(
-                        "sudo systemctl restart discord-bot", shell=True
-                    )
+                    subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
         else:
             await interaction.followup.send(
                 "An error occurred, refer to system logs for more info."
