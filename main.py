@@ -14,6 +14,8 @@ from discord.ext import commands, tasks
 
 import reference
 
+# Main Update Test
+
 # Initialize Env Variables
 load_dotenv()
 
@@ -213,9 +215,11 @@ def main():
                     except Exception as e:
                         print(f"Failed to reload {module} with reason: {e}")
                         await interaction.followup.send(
-                            f"Failed to reload module \"{module}\". Attempting to restart system."
+                            f'Failed to reload module "{module}". Attempting to restart system.'
                         )
-                        subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
+                        subprocess.Popen(
+                            "sudo systemctl restart discord-bot", shell=True
+                        )
                         break
         else:
             await interaction.followup.send(
