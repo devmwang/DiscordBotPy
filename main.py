@@ -195,22 +195,28 @@ def main():
         elif "fatal" not in combined:
             updated_modules = set(re.findall(r"(\w+(?=\.py))", combined))
 
-            await interaction.followup.send(
-                "Successfully pulled updates from Github. Attempting to restart modified modules."
-            )
+            if "main" in updated_modules:
+                await interaction.followup.send(
+                    "Successfully pulled updates from Github. Modifications to main detected. Attempting to restart system."
+                )
 
-            for module in updated_modules:
-                try:
-                    print(f"Reloading {module}...", end=" ")
-                    await client.reload_extension(module)
-                    print("Done!")
-                except Exception as e:
-                    print(f"Failed to reload {module} with reason: {e}")
-                    await interaction.followup.send(
-                        "Failed to reload 1 or more modules. Attempting to restart."
-                    )
-                    subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
-                    break
+            else:
+                await interaction.followup.send(
+                    "Successfully pulled updates from Github. Attempting to restart modified modules."
+                )
+
+                for module in updated_modules:
+                    try:
+                        print(f"Reloading {module}...", end=" ")
+                        await client.reload_extension(module)
+                        print("Done!")
+                    except Exception as e:
+                        print(f"Failed to reload {module} with reason: {e}")
+                        await interaction.followup.send(
+                            f"Failed to reload module \"{module}\". Attempting to restart system."
+                        )
+                        subprocess.Popen("sudo systemctl restart discord-bot", shell=True)
+                        break
         else:
             await interaction.followup.send(
                 "An error occurred, refer to system logs for more info."
