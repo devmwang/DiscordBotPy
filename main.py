@@ -19,22 +19,6 @@ import reference
 # Initialize Env Variables
 load_dotenv()
 
-# Startup cogs
-startup_cogs = [
-    "jishaku",
-    "exec",
-    "cpanel",
-    "bot_management",
-    "on_message",
-    "on_voice_state_update",
-    "school",
-    "binance",
-    "channel_logging",
-    "others",
-    "vc_management",
-    "clap",
-]
-
 # Initialize Discord client and slash command handler
 intents = discord.Intents.default()
 intents.message_content = True

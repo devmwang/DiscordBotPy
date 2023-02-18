@@ -9,7 +9,7 @@ startup_extensions = [
     "school",
     "bot_management",
     "others",
-    "ftx",
+    "binance",
     "clap",
     "vc_management",
 ]
