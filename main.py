@@ -201,13 +201,11 @@ def main():
         if "Already up to date." in response:
             pass  # Do nothing
         elif "fatal" not in combined:
+            updated_modules = set(re.findall(r"(\w+\.py)", combined))
+
             await interaction.followup.send(
                 "Successfully pulled updates from Github. Attempting to restart modified modules."
             )
-
-            updated_modules = set(re.findall(r"(\w+\.py)", combined))
-
-            print(updated_modules)
 
             for module in updated_modules:
                 try:
