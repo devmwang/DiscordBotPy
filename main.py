@@ -201,26 +201,28 @@ def main():
                 await interaction.followup.send(
                     "Successfully pulled updates from Github. Modifications to main detected. Attempting to restart system."
                 )
+                await interaction.followup.send(
+                    f'Failed to reload module "{module}". Attempting to restart system.'
+                )
 
             else:
                 await interaction.followup.send(
                     "Successfully pulled updates from Github. Attempting to restart modified modules."
                 )
 
-                for module in updated_modules:
-                    try:
+                try:
+                    for module in updated_modules:
                         print(f"Reloading {module}...", end=" ")
                         await client.reload_extension(module)
                         print("Done!")
-                    except Exception as e:
-                        print(f"Failed to reload {module} with reason: {e}")
-                        await interaction.followup.send(
-                            f'Failed to reload module "{module}". Attempting to restart system.'
-                        )
-                        subprocess.Popen(
-                            "sudo systemctl restart discord-bot", shell=True
-                        )
-                        break
+                except Exception as e:
+                    print(f"Failed to reload {module} with reason: {e}")
+                    await interaction.followup.send(
+                        f'Failed to reload module "{module}". Attempting to restart system.'
+                    )
+                    subprocess.Popen(
+                        "sudo systemctl restart discord-bot", shell=True
+                    )
         else:
             await interaction.followup.send(
                 "An error occurred, refer to system logs for more info."
