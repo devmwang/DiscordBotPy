@@ -1,5 +1,11 @@
 import json
+import re
 import subprocess
+import cv2
+import numpy as np
+import requests
+from PIL import Image
+from io import BytesIO
 import discord
 from discord.ext.commands import Bot, Cog
 
@@ -39,6 +45,27 @@ class OnMessage(Cog):
                 await message.reply(
                     f"You do not have permission to use this command. {self.client.xmarkGlyph(message.guild)}"
                 )
+
+        # Facial Recognition and Auto-Filtering
+        links = set(
+            re.findall(r"((?:http|https):(?:\w|\/|\.)+\.(?:jpg|png))", message.content)
+        )
+
+        for attachment in message.attachments:
+            if attachment.content_type in ["image/png", "image/jpeg"]:
+                links.add(attachment.url)
+
+        headers = {
+            "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36"
+        }
+        for link in links:
+            res = requests.get(link, headers=headers).content
+            bytes = Image.open(BytesIO(bytearray(res)))
+            img = np.array(bytes)
+
+            cv2.imshow("Image", img)
+            cv2.waitKey(5000)
+            cv2.destroyAllWindows()
 
         # Chat Filter
         filtered_seqs = ["did you mean", "you meant", "you appear to have misspelt"]
