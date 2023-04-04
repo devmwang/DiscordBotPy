@@ -2,6 +2,7 @@
 /.idea
 /.venv
 /__pycache__
+/FacialRecognitionAssets
 .env
 .DS_Store
 shaftmap.png
