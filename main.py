@@ -14,8 +14,6 @@ from discord.ext import commands, tasks
 
 import reference
 
-# Update Test
-
 # Initialize Env Variables
 load_dotenv()
 
