@@ -16,7 +16,7 @@ class School(Cog):
     async def clap(self, interaction: discord.Interaction):
 
         await interaction.response.send_message(
-            content=os.getenv("CURRENT_COURSE_SCHEDULE")
+            content=f"https://files.devmwang.com/wAba9/PedAVuGE23.png"
         )
 
 
